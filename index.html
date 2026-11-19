@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Alle Cold Cases | Stichting Coldcasezaken</title>
+<style>
+#cc-archive-demo{
+ --navy:#224576;--red:#C6534C;--ink:#263f60;--muted:#68778a;
+ --line:#dce3eb;--photo-bg:#EEF1F4;--space:12px;--section-space:24px;
+ font-family:Arial,Helvetica,sans-serif;color:var(--ink);
+ max-width:1180px;margin:0 auto;padding:18px 16px 48px;box-sizing:border-box
+}
+#cc-archive-demo *{box-sizing:border-box}
+#cc-archive-demo .intro{margin:0 0 var(--space)}
+#cc-archive-demo h1{font-size:clamp(27px,7vw,40px);line-height:1.03;letter-spacing:-.6px;color:var(--navy);margin:0 0 7px;font-weight:800}
+#cc-archive-demo .intro p{font-size:15px;line-height:1.45;margin:0;color:#4c5d70;max-width:760px}
+#cc-archive-demo .search input{display:block;width:100%;height:47px;border:1.5px solid #cbd5df;border-radius:7px;padding:0 13px;font:16px Arial;color:var(--navy);background:#fff;outline:none}
+#cc-archive-demo .search input:focus,#cc-archive-demo select:focus{border-color:var(--navy);box-shadow:0 0 0 2px #2245761c}
+#cc-archive-demo .archive-layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(290px,1fr);grid-template-areas:"search sort" "filters categories" "timeline categories";gap:var(--space);margin:0 0 var(--section-space);align-items:stretch}
+#cc-archive-demo .search{grid-area:search;margin:0}
+#cc-archive-demo .sort-wrap{grid-area:sort}
+#cc-archive-demo .sort-wrap select,#cc-archive-demo .filters select{width:100%;height:47px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--navy);padding:0 32px 0 11px;font:14px Arial,sans-serif;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.25 6 6.25 11 1.25' fill='none' stroke='%23224576' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:12px 8px}
+#cc-archive-demo .filters{grid-area:filters;display:grid;grid-template-columns:1fr 1fr;gap:var(--space);margin:0}
+#cc-archive-demo .timeline{grid-area:timeline}
+#cc-archive-demo .category-panel{grid-area:categories;align-self:stretch;min-height:100%}
+#cc-archive-demo .category-list{display:flex;flex-direction:column;gap:var(--space)}
+#cc-archive-demo select{appearance:none;-webkit-appearance:none;width:100%;height:41px;border:1px solid var(--line);border-radius:6px;padding:0 34px 0 10px;background-color:#fff;color:var(--navy);font-size:14px;outline:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.25 6 6.25 11 1.25' fill='none' stroke='%23224576' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:12px 8px}
+#cc-archive-demo .timeline,#cc-archive-demo .category-panel{border:1px solid var(--line);border-radius:8px;background:#fff;padding:var(--space)}
+#cc-archive-demo .timeline-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:var(--space)}
+#cc-archive-demo .timeline-scope{display:inline-flex;align-items:center;border-radius:4px;padding:5px 8px;background:#eaf0f7;color:var(--navy);font-size:11px;font-weight:700;white-space:nowrap}
+#cc-archive-demo h2{font-size:17px;line-height:1.2;color:var(--navy);margin:0;font-weight:750}
+#cc-archive-demo .decade-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--space)}
+#cc-archive-demo .decade-card{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;min-height:67px;padding:10px 11px;border:1px solid var(--line);border-radius:7px;background:#edf2f7;color:var(--navy);text-align:left;cursor:pointer;font-family:Arial,Helvetica,sans-serif}
+#cc-archive-demo .decade-card .period{font-size:13px;font-weight:700;white-space:nowrap}
+#cc-archive-demo .decade-card .count{font-size:20px;line-height:1.05;font-weight:800;font-variant-numeric:tabular-nums}
+#cc-archive-demo .decade-card.active{background:var(--navy);border-color:var(--navy);color:#fff}
+#cc-archive-demo .decade-card:hover{border-color:#9aabc0}
+#cc-archive-demo .year-picker{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+#cc-archive-demo .year-picker.visible{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#cc-archive-demo .year-picker label{font-size:13px;color:var(--muted);font-weight:700}
+#cc-archive-demo .year-picker select{max-width:230px;min-width:190px}
+#cc-archive-demo .category-panel h2{margin:0 0 var(--space)}
+#cc-archive-demo .category-toggle{display:none}
+#cc-archive-demo .category-list{display:flex;flex-direction:column;gap:var(--space)}
+#cc-archive-demo .category-choice{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:42px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);font:700 14px Arial,sans-serif;text-align:left;cursor:pointer}
+#cc-archive-demo .category-choice .cat-name{display:flex;align-items:center;gap:9px}
+#cc-archive-demo .category-dot{width:10px;height:10px;border-radius:3px;flex:none}
+#cc-archive-demo .category-choice strong{font-size:16px;color:var(--navy);font-variant-numeric:tabular-nums}
+#cc-archive-demo .category-choice.active{border-color:var(--navy);background:#edf2f7}
+#cc-archive-demo .category-choice:hover{border-color:#aab9ca}
+#cc-archive-demo .results-head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space);margin:0 0 var(--space)}
+#cc-archive-demo .results-head strong{font-size:18px;font-weight:800;color:var(--navy)}
+#cc-archive-demo .results-head span{font-size:11px;color:var(--muted)}
+#cc-archive-demo .grid{display:grid;grid-template-columns:1fr;gap:var(--space)}
+#cc-archive-demo .card{display:flex;flex-direction:column;text-decoration:none!important;color:inherit!important;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;box-shadow:none;transition:none}
+#cc-archive-demo .card:hover{border-color:var(--line);transform:none;box-shadow:none}
+#cc-archive-demo .card:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+#cc-archive-demo .photo{height:auto;aspect-ratio:4/5;background:transparent;overflow:hidden;position:relative}
+#cc-archive-demo .photo img{width:100%;height:100%;display:block;object-fit:cover;background:transparent}
+#cc-archive-demo .card-body{padding:var(--space);display:flex;flex:1;flex-direction:column}
+#cc-archive-demo .card h3{font-size:20px;line-height:1.15;color:var(--navy);font-weight:700;margin:0 0 1px;height:46px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
+#cc-archive-demo .card h3.title-medium{font-size:18px}
+#cc-archive-demo .card h3.title-small{font-size:16px}
+#cc-archive-demo .card h3.single-line{height:auto;-webkit-line-clamp:1;line-clamp:1;margin-bottom:5px}
+#cc-archive-demo .badge{display:inline-flex;align-items:center;min-height:23px;padding:4px 8px;border-radius:4px;color:#fff;font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
+#cc-archive-demo .badge.moord{background:#244875}
+#cc-archive-demo .badge.vermissing{background:#C6534C}
+#cc-archive-demo .badge.onbekend{background:#397c78}
+#cc-archive-demo .badge.overige{background:#68778a}
+#cc-archive-demo .badge-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:6px;margin-bottom:8px}
+#cc-archive-demo .badge-row .badge{margin:0}
+#cc-archive-demo .badge.update{background:#B8D94A;color:#192F55;margin:0;position:absolute;top:12px;left:12px;z-index:2;min-height:27px;padding:6px 10px;border-radius:4px;font-size:11px;letter-spacing:.55px;box-shadow:0 1px 4px rgba(0,0,0,.16)}
+#cc-archive-demo .meta{font-size:16px;line-height:1.3;color:#4f5e6e;margin:0 0 11px}
+#cc-archive-demo .card-bottom{margin-top:auto;display:flex;align-items:center;justify-content:flex-start;gap:10px;border-top:1px solid #edf0f3;padding-top:12px;color:var(--navy);font-size:15px;font-weight:400;line-height:1.25}
+#cc-archive-demo .card-bottom .cta{display:inline-flex;align-items:center;gap:5px}
+#cc-archive-demo .arrow{display:inline-block;color:currentColor;font-size:22px;line-height:1;font-weight:400;transform:translateY(-2px)}
+#cc-archive-demo .card:hover .card-bottom,
+#cc-archive-demo .card:hover .arrow{color:var(--red)}
+#cc-archive-demo .card:focus-visible .card-bottom,
+#cc-archive-demo .card:focus-visible .arrow{color:var(--red)}
+#cc-archive-demo .empty{padding:20px;border:1px dashed var(--line);border-radius:8px;color:var(--muted);font-size:14px}
+#cc-archive-demo .sample-note{font-size:11px;color:var(--muted);margin:0 0 var(--space)}
+@media(min-width:680px){
+ #cc-archive-demo{padding:22px 22px 56px}
+ #cc-archive-demo .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #cc-archive-demo .photo{aspect-ratio:4/5}
+}
+@media(min-width:1020px){#cc-archive-demo .grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){
+ #cc-archive-demo .archive-layout{grid-template-columns:minmax(0,1fr);grid-template-areas:"search" "sort" "filters" "timeline" "categories";gap:var(--space);margin-bottom:var(--space)}
+ #cc-archive-demo .filters{grid-template-columns:1fr 1fr;gap:var(--space)}
+ /* sortering staat op mobiel in een eigen regel boven de filters */
+ #cc-archive-demo .timeline,#cc-archive-demo .category-panel{padding:12px}
+ #cc-archive-demo .decade-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space)}
+ #cc-archive-demo .decade-card{min-height:62px;padding:9px 10px}
+ #cc-archive-demo .decade-card .period{font-size:12px}
+ #cc-archive-demo .decade-card .count{font-size:18px}
+ #cc-archive-demo .category-panel{padding:0;overflow:hidden}
+ #cc-archive-demo .category-toggle{display:flex;width:100%;align-items:center;justify-content:space-between;min-height:48px;padding:0 13px;border:0;background:#fff;color:var(--navy);font:700 15px Arial,sans-serif;text-align:left;cursor:pointer}
+ #cc-archive-demo .category-toggle .chevron{font-size:18px}
+ #cc-archive-demo .category-content{display:none;padding:16px 11px 11px}
+ #cc-archive-demo .category-content h2{display:none}
+ #cc-archive-demo .category-panel.open .category-content{display:block}
+ #cc-archive-demo .category-panel.open .category-toggle{border-bottom:1px solid var(--line)}
+ #cc-archive-demo .category-choice{min-height:40px}
+}
+@media(max-width:420px){
+ #cc-archive-demo .year-picker{align-items:stretch;flex-direction:column;gap:6px}
+ #cc-archive-demo .year-picker select{max-width:none;width:100%}
+}
+</style>
+</head>
+<body style="margin:0;background:#fff">
+<div id="cc-archive-demo">
+ <section class="intro">
+  <h1>Alle Cold Cases</h1>
+  <p>Bekijk dossiers over onopgeloste moorden, vermissingen en onbekende doden uit Nederland, België en daarbuiten. Zoek op naam, plaats, type zaak of jaartal.</p>
+ </section>
+ <section class="archive-layout" aria-label="Zoeken en bladeren door dossiers">
+  <div class="search"><input id="cc-search" type="search" placeholder="Zoek op naam of plaats…" aria-label="Zoek op naam of plaats"></div>
+  <div class="sort-wrap">
+   <select id="cc-sort" class="sort" aria-label="Sorteren"><option value="new">Nieuwste zaken eerst</option><option value="old">Oudste zaken eerst</option><option value="updated">Laatst bijgewerkt</option><option value="az">Naam A–Z</option><option value="za">Naam Z–A</option></select>
+  </div>
+  <div class="filters">
+   <select id="cc-type" aria-label="Categorie"><option value="">Alle categorieën</option><option>Vermissing</option><option>Moord</option><option>Onbekende doden</option><option>Overige</option></select>
+   <input type="hidden" id="cc-decade" value="">
+   <select id="cc-status" aria-label="Dossierstatus"><option value="">Alle dossiers</option><option value="updated">Recent bijgewerkt</option></select>
+  </div>
+  <div class="timeline" aria-label="Zaken door de jaren heen">
+   <div class="timeline-head"><h2>Zaken door de jaren heen</h2><span class="timeline-scope" id="cc-chart-scope">Alle categorieën</span></div>
+   <div class="decade-list" id="cc-decade-list"></div>
+   <div class="year-picker" id="cc-year-picker"><label for="cc-year">Of kies een specifiek jaar</label><select id="cc-year" aria-label="Specifiek jaar"><option value="">Alle jaren in deze periode</option></select></div>
+  </div>
+  <section class="category-panel" id="cc-category-panel" aria-label="Zaken per categorie">
+   <button class="category-toggle" id="cc-category-toggle" type="button" aria-expanded="false"><span>Zaken per categorie</span><span class="chevron">⌄</span></button>
+   <div class="category-content" id="cc-category-content"><h2>Zaken per categorie</h2><div class="category-list" id="cc-category-list"></div></div>
+  </section>
+ </section>
+ <div class="results-head"><strong id="cc-count">40 dossiers</strong><span id="cc-result-note">40 echte dossiers · 10 per categorie</span></div>
+ <p class="sample-note">Selectie uit het bestaande zakenbestand, met bestaande dossierlinks en fotobronnen.</p>
+ <div class="grid" id="cc-grid"></div>
+</div>
+<script>
+const cases=[{"name": "De moord op Jan Schoenmakers 1967", "place": "Oirschot", "year": 1967, "category": "Moord", "url": "https://www.coldcasezaken.nl/jan-schoenmakers", "image": "images/1-237.jpg"}, {"name": "De moord op Simone de Laat 1989", "place": "Ferwert", "year": 1989, "category": "Moord", "url": "https://www.coldcasezaken.nl/simone-de-laat", "image": "images/image-57.png"}, {"name": "De moord op Christiane Heiser 1992", "place": "Elsene", "year": 1992, "category": "Moord", "url": "https://www.coldcasezaken.nl/christiane-heiser", "image": "images/1-1.jpeg"}, {"name": "De moord op Hayrettin Sahin 1995", "place": "Zwanenburg", "year": 1995, "category": "Moord", "url": "https://www.coldcasezaken.nl/hayrettin-sahin", "image": "images/1-3.png"}, {"name": "De moord op Cornelis Booisma 1998", "place": "Groningen", "year": 1998, "category": "Moord", "url": "https://www.coldcasezaken.nl/cor-booisma", "image": "images/1-58.jpg"}, {"name": "De moord op Annie Visman Venema 2003", "place": "IJmuiden", "year": 2003, "category": "Moord", "url": "https://www.coldcasezaken.nl/annie-visman-venema", "image": "images/annie-visman-venema.jpg"}, {"name": "De moord op Ann Bourgoin 2006", "place": "Antwerpen", "year": 2006, "category": "Moord", "url": "https://www.coldcasezaken.nl/ann-bourgoin", "image": "images/1-196.jpg"}, {"name": "De moord op Hennie Schellenberg 2011", "place": "Amsterdam", "year": 2011, "category": "Moord", "url": "https://www.coldcasezaken.nl/hennie-schellenberg", "image": "images/image-high-fvox0k.png"}, {"name": "De moord op Peter van Dongen 2022", "place": "Helvoirt", "year": 2022, "category": "Moord", "url": "https://www.coldcasezaken.nl/peter-van-dongen", "image": "images/afbeelding-slachtoffer-van-dongen-standard.png"}, {"name": "De moord op John Yellowley 1998", "place": "IJmuiden", "year": 1998, "category": "Moord", "url": "https://www.coldcasezaken.nl/john-yellowley", "image": "https://primary.jwwb.nl/public/t/l/i/temp-bqjoudxtrdpcquxbogqx/asasasas-standard-eeol96.png"}, {"name": "Verdwijning Hanno van Mil", "place": "Woudenberg", "year": 2014, "category": "Vermissing", "url": "https://www.coldcasezaken.nl/hanno-van-mil", "image": "images/large-vecteezy_a-dark-room-with-a-light-at-the-top_30648142_large-high.jpg"}, {"name": "De vermissing van Eefke Wolf 1983", "place": "Hattem", "year": 1983, "category": "Vermissing", "url": "https://www.coldcasezaken.nl/eefke-wolf", "image": "images/3-27.jpg"}, {"name": "De vermissing van Duncan Zwakke 1989", "place": "Zutphen", "year": 1989, "category": "Vermissing", "url": "https://www.coldcasezaken.nl/duncan-zwakke", "image": "images/duncan-zwakke.jpg"}, {"name": "De vermissing van Liam Vanden Branden 1996", "place": "Mechelen", "year": 1996, "category": "Vermissing", "url": "https://www.coldcasezaken.nl/liam-vanden-branden", "image": "images/5-8.jpg"}, {"name": "De vermissing van Ringo Deman 2001", "place": "Oostende", "year": 2001, "category": "Vermissing", "url": "https://www.coldcasezaken.nl/ringo-deman", "image": "images/1-3-1.jpg"}, {"name": "De vermissing van Deborah Rosiek 2003", "place": "Amsterdam", "year": 2003, "category": "Vermissing", "url": "https://www.coldcasezaken.nl/deborah-rosiek", "image": "images/deborah-rosiek-high.jpg"}, {"name": "De vermissing van Marian Kusters 2009", "place": "Groningen", "year": 2009, "category": "Vermissing", "url": "https://www.coldcasezaken.nl/marian-kusters", "image": "images/1-171.jpg"}, {"name": "De vermissing van Rebecca Groenendijk 2014", "place": "Zwijndrecht", "year": 2014, "category": "Vermissing", "url": "https://www.coldcasezaken.nl/rebecca-groenendijk", "image": "images/1-280.jpg"}, {"name": "De vermissing van Jakob Johan de Bruijn 2022", "place": "Delft", "year": 2022, "category": "Vermissing", "url": "https://www.coldcasezaken.nl/jakob-johan-de-bruijn", "image": "images/550900514_24201040139596785_418436105436203320_n-high.png"}, {"name": "De vermissing van Monika Tanova 2010", "place": "Rotterdam", "year": 2010, "category": "Vermissing", "url": "https://www.coldcasezaken.nl/monika-tanova", "image": "https://primary.jwwb.nl/public/t/l/i/temp-bqjoudxtrdpcquxbogqx/saz-high.png"}, {"name": "Het onbekende Heulmeisje 1976", "place": "Maarsbergen", "year": 1976, "category": "Onbekende doden", "url": "https://www.coldcasezaken.nl/ongeidentificeerde-doden/jane-doe-maarsbergen-heulmeisje", "image": "images/nl01-main-photo-1-high-xh8g3j-1-high.jpg"}, {"name": "De overblijfselen van onbekende dode man 2002", "place": "Groningen", "year": 2002, "category": "Onbekende doden", "url": "https://www.coldcasezaken.nl/onbekende-man-boterdiep", "image": "images/02010067p1-high.jpg"}, {"name": "Lichaam van onbekende dode man 2015", "place": "Oud Zuilen", "year": 2015, "category": "Onbekende doden", "url": "https://www.coldcasezaken.nl/onbekende-man-vecht", "image": "images/image-14.png"}, {"name": "Onbekende dode vrouw 1991", "place": "Neustadt (Wied)", "year": 1991, "category": "Onbekende doden", "url": "https://www.coldcasezaken.nl/duitse-jane-doe", "image": "images/nn-er-duitsland-snelweg2-high.jpg"}, {"name": "Onbekende dode man 1995", "place": "Amsterdam", "year": 1995, "category": "Onbekende doden", "url": "https://www.coldcasezaken.nl/ongeidentificeerde-doden/john-doe-westerdoksdijk", "image": "images/firefly-maak-een-serieuze-realistische-foto-afbeelding-van-een-middeleeuwse-tandarts-die-in-de-mond-1-high.jpg"}, {"name": "Onbekende dode man 2003", "place": "Tiel", "year": 2003, "category": "Onbekende doden", "url": "https://www.coldcasezaken.nl/ongeidentificeerde-doden/john-doe-tiel", "image": "images/nnddd-high-nmewuu.jpg", "updated": true, "updatedAt": "2026-11-18"}, {"name": "Onbekende dode jongeman 2010", "place": "Westzaan", "year": 2010, "category": "Onbekende doden", "url": "https://www.coldcasezaken.nl/ongeidentificeerde-doden/john-doe-westzaan", "image": "images/img_2107-high.jpg"}, {"name": "Onbekende dode man 2018", "place": "Saint-Georges-sur-Meuse", "year": 2018, "category": "Onbekende doden", "url": "https://www.coldcasezaken.nl/ongeidentificeerde-doden/john-doe-bij-luik", "image": "images/image-high-rxdga1.png"}, {"name": "Onbekende dode man 2022", "place": "Amsterdam", "year": 2022, "category": "Onbekende doden", "url": "https://www.coldcasezaken.nl/ongeidentificeerde-doden/john-doe-torontobrug", "image": "images/nn-high.png"}, {"name": "Onbekend babylijkje 1996", "place": "Rotterdam", "year": 1996, "category": "Onbekende doden", "url": "https://www.coldcasezaken.nl/onbekende-baby-rijnhaven", "image": "https://primary.jwwb.nl/public/t/l/i/temp-bqjoudxtrdpcquxbogqx/asasassaas-high-zj55j8.png?enable-io=true&enable=upscale&crop=1.1859%3A1%2Coffset-y62&width=800"}, {"name": "De mysterieuze dood van Kris Kremers en Lisanne Froon - Panama 2014", "place": "Boquete", "year": 2014, "category": "Overige", "url": "https://www.coldcasezaken.nl/kris-kremers-en-lisanne-froon", "image": "images/kremersfroonthumbsup-high.webp"}, {"name": "Het onbekende 'Kelderlijk' 1982", "place": "Amsterdam", "year": 1982, "category": "Overige", "url": "https://www.coldcasezaken.nl/het-kelderlijk", "image": "images/image-74.png"}, {"name": "Onbekend babylijkje 1994", "place": "'s-Hertogenbosch", "year": 1994, "category": "Overige", "url": "https://www.coldcasezaken.nl/babylijkje-den-bosch", "image": "images/untitled-1-5.jpg"}, {"name": "Onbekend baby lijkje 1997", "place": "Amsterdam", "year": 1997, "category": "Overige", "url": "https://www.coldcasezaken.nl/dode-baby-celebesstraat-amsterdam", "image": "images/jm43-040497-dekbedovertrek.png"}, {"name": "Een onbekend babylijkje 2006", "place": "Utrecht", "year": 2006, "category": "Overige", "url": "https://www.coldcasezaken.nl/renee-van-utrecht", "image": "images/1-130.jpg"}, {"name": "Een onbekend babylijkje 2006", "place": "'s-Hertogenbosch", "year": 2006, "category": "Overige", "url": "https://www.coldcasezaken.nl/engeltje-van-het-meer", "image": "images/2-81.jpg"}, {"name": "De mysterieuze dood van Stefan Brants 2010", "place": "Diepenbeek", "year": 2010, "category": "Overige", "url": "https://www.coldcasezaken.nl/stefan-brants", "image": "images/1-143.jpg"}, {"name": "Onbekend babylijkje Sterre van de Laarakker 2012", "place": "Liempde", "year": 2012, "category": "Overige", "url": "https://www.coldcasezaken.nl/sterre-van-de-laarakker", "image": "images/liempde2.jpg"}, {"name": "De mysterieuze dood van Karin Grijpstra 2020", "place": "Koarnjum", "year": 2020, "category": "Overige", "url": "https://www.coldcasezaken.nl/karin-grijpstra-1", "image": "images/karin-grijpstra_high-res-high-high.jpg"}, {"name": "De moord op het onbekende Heulmeisje 1976", "place": "Maarsbergen", "year": 1976, "category": "Overige", "url": "https://www.coldcasezaken.nl/ongeidentificeerde-doden/jane-doe-maarsbergen-heulmeisje", "image": "images/nl01-main-photo-1-high-xh8g3j-1-high.jpg"}];
+const $=id=>document.getElementById(id);
+const esc=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+const catClass=value=>value==="Moord"?"moord":value==="Vermissing"?"vermissing":value==="Onbekende doden"?"onbekend":"overige";
+let selectedYear="";
+function activeCasesForChart(){
+ const category=$("cc-type").value;
+ return cases.filter(c=>(!category||c.category===category));
+}
+let selectedDecade="";
+function setup(){
+ // Decenniumselectie gebeurt via de klikbare periodekaarten; verborgen veld houdt
+ // de bestaande filterlogica en combinaties met zoekopdracht/categorie intact.
+}
+function renderChart(){
+ const category=$("cc-type").value;
+ const rows=cases.filter(c=>!category||c.category===category);
+ const decadeMap={};
+ rows.forEach(c=>{const d=Math.floor(Number(c.year)/10)*10;(decadeMap[d]??=[]).push(c)});
+ const decades=Object.keys(decadeMap).map(Number).sort((a,b)=>b-a);
+ const scope=$("cc-chart-scope");
+ scope.textContent=category||"Alle categorieën";
+ scope.style.background=category==="Vermissing"?"#f8e9e7":category==="Moord"?"#e8eef6":category==="Onbekende doden"?"#e6f1f0":category==="Overige"?"#edf0f3":"#eaf0f7";
+ scope.style.color=category==="Vermissing"?"#C6534C":category==="Moord"?"#224576":category==="Onbekende doden"?"#397c78":category==="Overige"?"#68778a":"#224576";
+ const activeDec=$("cc-decade").value;
+ selectedDecade=activeDec;
+ $("cc-decade-list").innerHTML=decades.map(d=>{
+  const total=decadeMap[d].length;
+  const active=String(d)===String(activeDec);
+  return `<button type="button" class="decade-card ${active?"active":""}" data-decade="${d}" aria-pressed="${active}"><span class="period">${d}–${d+9}</span><span class="count">${total} ${total===1?"zaak":"zaken"}</span></button>`;
+ }).join("");
+ const yearPicker=$("cc-year-picker"), yearSelect=$("cc-year");
+ if(activeDec){
+  const yearCounts={};rows.filter(c=>Number(c.year)>=Number(activeDec)&&Number(c.year)<Number(activeDec)+10).forEach(c=>yearCounts[c.year]=(yearCounts[c.year]||0)+1);
+  yearSelect.innerHTML='<option value="">Alle jaren in deze periode</option>'+Object.keys(yearCounts).map(Number).sort((a,b)=>a-b).map(y=>`<option value="${y}">${y} · ${yearCounts[y]} ${yearCounts[y]===1?"zaak":"zaken"}</option>`).join("");
+  yearSelect.value=selectedYear;
+  yearPicker.classList.add("visible");
+ }else{
+  yearSelect.innerHTML='<option value="">Alle jaren in deze periode</option>';
+  yearPicker.classList.remove("visible");
+  selectedYear="";
+ }
+ const cats=["Moord","Vermissing","Onbekende doden","Overige"];
+ const catCounts=Object.fromEntries(cats.map(c=>[c,cases.filter(x=>x.category===c).length]));
+ const dotColors={"Moord":"#244875","Vermissing":"#C6534C","Onbekende doden":"#397c78","Overige":"#68778a"};
+ $("cc-category-list").innerHTML=cats.map(c=>`<button type="button" class="category-choice ${category===c?"active":""}" data-category="${esc(c)}" aria-pressed="${category===c}"><span class="cat-name"><span class="category-dot" style="background:${dotColors[c]}"></span>${c}</span><strong>${catCounts[c]}</strong></button>`).join("");
+ $("cc-decade-list").querySelectorAll(".decade-card").forEach(b=>b.addEventListener("click",()=>{
+  const d=b.dataset.decade;
+  $("cc-decade").value=$("cc-decade").value===d?"":d;
+  selectedYear="";renderChart();renderCards();
+ }));
+ $("cc-category-list").querySelectorAll(".category-choice").forEach(b=>b.addEventListener("click",()=>{
+  $("cc-type").value=$("cc-type").value===b.dataset.category?"":b.dataset.category;
+  selectedYear="";renderChart();renderCards();
+ }));
+}
+
+async function recoverDossierImage(img){
+ if(img.dataset.retried==="1") return;
+ img.dataset.retried="1";
+ const card=img.closest(".card");
+ const dossierUrl=card?.getAttribute("href");
+ if(!dossierUrl) return showMissingImage(img);
+ try{
+  const response=await fetch(dossierUrl,{credentials:"same-origin"});
+  if(!response.ok) throw new Error("Dossierpagina niet bereikbaar");
+  const html=await response.text();
+  const doc=new DOMParser().parseFromString(html,"text/html");
+  const candidates=[...doc.querySelectorAll('a[href*="primary.jwwb.nl"], img[src*="primary.jwwb.nl"], source[srcset*="primary.jwwb.nl"]')];
+  let found="";
+  for(const el of candidates){
+   const raw=el.getAttribute("href")||el.getAttribute("src")||(el.getAttribute("srcset")||"").split(",")[0].trim().split(" ")[0];
+   if(raw && /\.(?:jpe?g|png|webp)(?:[?#]|$)/i.test(raw)){
+    found=new URL(raw,dossierUrl).href; break;
+   }
+  }
+  if(!found) throw new Error("Geen dossierfoto gevonden");
+  img.src=found;
+ }catch(e){showMissingImage(img);}
+}
+function showMissingImage(img){
+ const photo=img.closest(".photo");
+ if(photo) photo.innerHTML='<div style="padding:18px;color:#68778a;text-align:center;font-size:13px">Foto niet beschikbaar</div>';
+}
+function renderCards(){
+ const q=$("cc-search").value.trim().toLowerCase(),dec=$("cc-decade").value;
+ const status=$("cc-status").value;
+ let list=cases.filter(c=>(!q||(c.name+" "+c.place+" "+c.year).toLowerCase().includes(q))&&(!$("cc-type").value||c.category===$("cc-type").value)&&(!dec||(c.year>=Number(dec)&&c.year<Number(dec)+10))&&(!selectedYear||String(c.year)===selectedYear)&&(!status||(status==="updated"&&c.updated)));
+ const s=$("cc-sort").value;
+ list.sort((a,b)=>s==="old"?a.year-b.year:s==="updated"?((b.updatedAt||"").localeCompare(a.updatedAt||""))||Number(!!b.updated)-Number(!!a.updated):s==="az"?a.name.localeCompare(b.name,"nl"):s==="za"?b.name.localeCompare(a.name,"nl"):b.year-a.year);
+ $("cc-count").textContent=`${list.length} dossiers`;
+ $("cc-grid").innerHTML=list.length?list.map(c=>`<a class="card" href="${esc(c.url)}">
+  <div class="photo"><img loading="lazy" decoding="async" src="${esc(c.image)}" alt="Dossierfoto bij ${esc(c.name)}" onerror="recoverDossierImage(this)">${c.updated?'<span class="badge update">UPDATE</span>':""}</div>
+  <div class="card-body"><div class="badge-row"><span class="badge ${catClass(c.category)}">${esc(c.category)}</span></div><h3 class="${c.name.length>43?"title-small":c.name.length>32?"title-medium":""}">${esc(c.name)}</h3><p class="meta">${esc(c.place)}</p>
+   <div class="card-bottom"><span class="cta">Bekijk dossier <span class="arrow" aria-hidden="true">»</span></span></div>
+  </div></a>`).join(""):'<div class="empty">Geen dossiers gevonden.</div>';
+ // Bij titels die op één regel passen, sluit de locatie directer aan.
+ $("cc-grid").querySelectorAll(".card h3").forEach(title=>{
+  const range=document.createRange();
+  range.selectNodeContents(title);
+  const textHeight=range.getBoundingClientRect().height;
+  const lineHeight=parseFloat(getComputedStyle(title).lineHeight)||23;
+  if(textHeight<=lineHeight+1) title.classList.add("single-line");
+ });
+}
+setup();renderChart();renderCards();
+["cc-search","cc-sort","cc-status"].forEach(id=>$(id).addEventListener(id==="cc-search"?"input":"change",renderCards));
+$("cc-decade").addEventListener("change",()=>{selectedYear="";renderChart();renderCards();});
+$("cc-year").addEventListener("change",()=>{selectedYear=$("cc-year").value;renderCards();});
+$("cc-type").addEventListener("change",()=>{selectedYear="";renderChart();renderCards();});
+$("cc-category-toggle").addEventListener("click",()=>{const panel=$("cc-category-panel");const open=panel.classList.toggle("open");$("cc-category-toggle").setAttribute("aria-expanded",String(open));$("cc-category-toggle").querySelector(".chevron").textContent=open?"⌃":"⌄";});
+</script>
+</body></html>
