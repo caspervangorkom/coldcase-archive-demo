@@ -17,9 +17,9 @@
 #cc-archive-demo .intro p{font-size:15px;line-height:1.45;margin:0;color:#4c5d70;max-width:760px}
 #cc-archive-demo .search input{display:block;width:100%;height:47px;border:1.5px solid #cbd5df;border-radius:7px;padding:0 13px;font:16px Arial;color:var(--navy);background:#fff;outline:none}
 #cc-archive-demo .search input:focus,#cc-archive-demo select:focus{border-color:var(--navy);box-shadow:0 0 0 2px #2245761c}
-#cc-archive-demo .archive-actions{display:grid;grid-template-columns:1fr 1fr;gap:var(--space);width:39.2%;margin:0 0 var(--space) auto}
+#cc-archive-demo .archive-actions{display:grid;grid-template-columns:1fr 1fr;gap:var(--space);width:calc((100% - var(--space)) / 2.55);margin:0 0 var(--space) auto}
 #cc-archive-demo .archive-actions a{display:inline-flex;align-items:center;justify-content:center;width:100%;min-height:47px;padding:8px 12px;border:1px solid #5D8638;border-radius:7px;text-decoration:none;text-align:center;font:400 15px Arial,sans-serif;white-space:normal}
-#cc-archive-demo .archive-actions .action-tip{background:#5D8638;border-color:#5D8638;color:#fff}
+#cc-archive-demo .archive-actions .action-tip{display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;background:#5D8638;border-color:#5D8638;color:#fff;padding-left:12px;padding-right:12px;line-height:1.2}
 #cc-archive-demo .archive-actions .action-support{background:#eaf0f7;border-color:var(--navy);color:var(--navy)}
 #cc-archive-demo .archive-actions a:hover{filter:brightness(.96)}
 #cc-archive-demo .archive-layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(290px,1fr);grid-template-areas:"search sort" "filters categories" "timeline categories";gap:var(--space);margin:0 0 var(--section-space);align-items:stretch}
@@ -75,7 +75,7 @@
 #cc-archive-demo .badge.overige{background:#68778a}
 #cc-archive-demo .badge-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:6px;margin-bottom:8px}
 #cc-archive-demo .badge-row .badge{margin:0}
-#cc-archive-demo .badge.new{background:#B8D94A;color:#192F55;margin:0;position:static;min-height:23px;padding:4px 8px;border-radius:4px;font-size:10px;letter-spacing:.5px;box-shadow:none}
+#cc-archive-demo .badge.new{background:#E7A52B;color:#243B59;margin:0;position:absolute;top:12px;left:12px;z-index:2;min-height:23px;padding:5px 9px;border-radius:4px;font-size:10px;letter-spacing:.5px;box-shadow:0 1px 4px rgba(0,0,0,.16)}
 #cc-archive-demo .badge.update{background:#B8D94A;color:#192F55;margin:0;position:static;z-index:auto;min-height:23px;padding:4px 8px;border-radius:4px;font-size:10px;letter-spacing:.5px;box-shadow:none}
 #cc-archive-demo .meta{font-size:16px;line-height:1.3;color:#4f5e6e;margin:0 0 11px}
 #cc-archive-demo .card-bottom{margin-top:auto;display:flex;align-items:center;justify-content:flex-start;gap:10px;border-top:1px solid #edf0f3;padding-top:12px;color:var(--navy);font-size:15px;font-weight:400;line-height:1.25}
@@ -94,7 +94,7 @@
 }
 @media(min-width:1020px){#cc-archive-demo .grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:760px){
- #cc-archive-demo .archive-actions{width:100%;grid-template-columns:1fr 1fr;gap:var(--space);margin-left:0}
+ #cc-archive-demo .archive-actions{width:100%;grid-template-columns:1fr 1fr;gap:var(--space);margin-left:0;margin-right:0}
  #cc-archive-demo .archive-actions a{min-width:0;min-height:47px;padding:8px 10px;font-size:14px}
  #cc-archive-demo .archive-layout{grid-template-columns:minmax(0,1fr);grid-template-areas:"search" "sort" "filters" "timeline" "categories";gap:var(--space);margin-bottom:var(--space)}
  #cc-archive-demo .filters{grid-template-columns:1fr 1fr;gap:var(--space)}
@@ -242,8 +242,8 @@ function renderCards(){
  list.sort((a,b)=>s==="old"?a.year-b.year:s==="updated"?((b.updatedAt||"").localeCompare(a.updatedAt||""))||Number(!!b.updated)-Number(!!a.updated):s==="az"?a.name.localeCompare(b.name,"nl"):s==="za"?b.name.localeCompare(a.name,"nl"):b.year-a.year);
  $("cc-count").textContent=`${list.length} dossiers`;
  $("cc-grid").innerHTML=list.length?list.map(c=>`<a class="card" href="${esc(c.url)}">
-  <div class="photo"><img loading="lazy" decoding="async" src="${esc(c.image)}" alt="Dossierfoto bij ${esc(c.name)}" onerror="recoverDossierImage(this)"></div>
-  <div class="card-body"><div class="badge-row">${c.recentAdded?'<span class="badge new">NIEUW</span>':""}${c.updated?'<span class="badge update">UPDATE</span>':""}<span class="badge ${catClass(c.category)}">${esc(c.category)}</span></div><h3 class="${c.name.length>43?"title-small":c.name.length>32?"title-medium":""}">${esc(c.name)}</h3><p class="meta">${esc(c.place)}</p>
+  <div class="photo"><img loading="lazy" decoding="async" src="${esc(c.image)}" alt="Dossierfoto bij ${esc(c.name)}" onerror="recoverDossierImage(this)">${c.recentAdded?'<span class="badge new">NIEUW</span>':""}</div>
+  <div class="card-body"><div class="badge-row">${c.updated?'<span class="badge update">UPDATE</span>':""}<span class="badge ${catClass(c.category)}">${esc(c.category)}</span></div><h3 class="${c.name.length>43?"title-small":c.name.length>32?"title-medium":""}">${esc(c.name)}</h3><p class="meta">${esc(c.place)}</p>
    <div class="card-bottom"><span class="cta">Bekijk dossier <span class="arrow" aria-hidden="true">»</span></span></div>
   </div></a>`).join(""):'<div class="empty">Geen dossiers gevonden.</div>';
  // Bij titels die op één regel passen, sluit de locatie directer aan.
