@@ -69,7 +69,7 @@
 #cc-archive-demo .card h3.title-small{font-size:16px}
 #cc-archive-demo .card h3.single-line{height:auto;-webkit-line-clamp:1;line-clamp:1;margin-bottom:5px}
 #cc-archive-demo .badge{display:inline-flex;align-items:center;min-height:23px;padding:4px 8px;border-radius:4px;color:#fff;font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
-#cc-archive-demo .badge.moord{background:#244875}
+#cc-archive-demo .badge.moord{background:#3985B8}
 #cc-archive-demo .badge.vermissing{background:#C6534C}
 #cc-archive-demo .badge.onbekend{background:#397c78}
 #cc-archive-demo .badge.overige{background:#68778a}
@@ -128,7 +128,14 @@
  <section class="archive-layout" aria-label="Zoeken en bladeren door dossiers">
   <div class="search"><input id="cc-search" type="search" placeholder="Zoek op naam of plaats…" aria-label="Zoek op naam of plaats"></div>
   <div class="sort-wrap">
-   <select id="cc-sort" class="sort" aria-label="Sorteren"><option value="new">Nieuwste zaken eerst</option><option value="old">Oudste zaken eerst</option><option value="updated">Laatst bijgewerkt</option><option value="az">Naam A–Z</option><option value="za">Naam Z–A</option></select>
+   <select id="cc-sort" class="sort" aria-label="Sorteer dossiers">
+    <option value="year-desc">Jaar van de zaak: nieuwste eerst</option>
+    <option value="year-asc">Jaar van de zaak: oudste eerst</option>
+    <option value="added-desc">Datum toegevoegd: nieuwste eerst</option>
+    <option value="added-asc">Datum toegevoegd: oudste eerst</option>
+    <option value="name-asc">Naam A–Z</option>
+    <option value="name-desc">Naam Z–A</option>
+   </select>
   </div>
   <div class="filters">
    <select id="cc-type" aria-label="Categorie"><option value="">Alle categorieën</option><option>Vermissing</option><option>Moord</option><option>Onbekende doden</option><option>Overige</option></select>
@@ -172,8 +179,9 @@ function renderChart(){
  const decades=Object.keys(decadeMap).map(Number).sort((a,b)=>b-a);
  const scope=$("cc-chart-scope");
  scope.textContent=category||"Alle categorieën";
- scope.style.background=category==="Vermissing"?"#f8e9e7":category==="Moord"?"#e8eef6":category==="Onbekende doden"?"#e6f1f0":category==="Overige"?"#edf0f3":"#eaf0f7";
- scope.style.color=category==="Vermissing"?"#C6534C":category==="Moord"?"#224576":category==="Onbekende doden"?"#397c78":category==="Overige"?"#68778a":"#224576";
+ const categoryColors={"Moord":"#3985B8","Vermissing":"#C6534C","Onbekende doden":"#397c78","Overige":"#68778a"};
+ scope.style.background=category?categoryColors[category]:"#eaf0f7";
+ scope.style.color=category?"#fff":"#224576";
  const activeDec=$("cc-decade").value;
  selectedDecade=activeDec;
  $("cc-decade-list").innerHTML=decades.map(d=>{
@@ -194,7 +202,7 @@ function renderChart(){
  }
  const cats=["Moord","Vermissing","Onbekende doden","Overige"];
  const catCounts=Object.fromEntries(cats.map(c=>[c,cases.filter(x=>x.category===c).length]));
- const dotColors={"Moord":"#244875","Vermissing":"#C6534C","Onbekende doden":"#397c78","Overige":"#68778a"};
+ const dotColors={"Moord":"#3985B8","Vermissing":"#C6534C","Onbekende doden":"#397c78","Overige":"#68778a"};
  $("cc-category-list").innerHTML=cats.map(c=>`<button type="button" class="category-choice ${category===c?"active":""}" data-category="${esc(c)}" aria-pressed="${category===c}"><span class="cat-name"><span class="category-dot" style="background:${dotColors[c]}"></span>${c}</span><strong>${catCounts[c]}</strong></button>`).join("");
  $("cc-decade-list").querySelectorAll(".decade-card").forEach(b=>b.addEventListener("click",()=>{
   const d=b.dataset.decade;
@@ -239,7 +247,49 @@ function renderCards(){
  const status=$("cc-status").value;
  let list=cases.filter(c=>(!q||(c.name+" "+c.place+" "+c.year).toLowerCase().includes(q))&&(!$("cc-type").value||c.category===$("cc-type").value)&&(!dec||(c.year>=Number(dec)&&c.year<Number(dec)+10))&&(!selectedYear||String(c.year)===selectedYear)&&(!status||(status==="updated"&&c.updated)||(status==="added"&&c.recentAdded)));
  const s=$("cc-sort").value;
- list.sort((a,b)=>s==="old"?a.year-b.year:s==="updated"?((b.updatedAt||"").localeCompare(a.updatedAt||""))||Number(!!b.updated)-Number(!!a.updated):s==="az"?a.name.localeCompare(b.name,"nl"):s==="za"?b.name.localeCompare(a.name,"nl"):b.year-a.year);
+ const collator=new Intl.Collator("nl",{sensitivity:"base",numeric:true});
+ // Sorteer op achternaam waar een persoonsnaam herkenbaar is. Bij onbekende
+ // personen of niet-persoonszaken wordt de opgeschoonde dossiernaam gebruikt.
+ const sortName=value=>String(value||"")
+  .replace(/^de moord op\s+/i,"")
+  .replace(/^de vermissing van\s+/i,"")
+  .replace(/^verdwijning\s+/i,"")
+  .replace(/^de mysterieuze dood van\s+/i,"")
+  .replace(/^de overblijfselen van\s+/i,"")
+  .replace(/^het onbekende\s+/i,"")
+  .replace(/^een onbekend(e)?\s+/i,"")
+  .replace(/^onbekend(e)?\s+/i,"")
+  .replace(/\s+\d{4}\b/g,"")
+  .trim();
+ const surnameKey=value=>{
+  const cleaned=sortName(value);
+  const words=cleaned.split(/\s+/).filter(Boolean);
+  return words.length>1?words[words.length-1]:cleaned;
+ };
+ const compareName=(a,b)=>collator.compare(surnameKey(a.name),surnameKey(b.name))||collator.compare(sortName(a.name),sortName(b.name));
+ const compareYear=(a,b)=>Number(a.year||0)-Number(b.year||0);
+ const validISODate=value=>{
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(value||"")) return "";
+  const date=new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(date.getTime())&&date.toISOString().slice(0,10)===value?value:"";
+ };
+ const compareAdded=(a,b)=>{
+  const da=validISODate(a.addedAt);
+  const db=validISODate(b.addedAt);
+  // Onbekende datums blijven bij beide richtingen onderaan staan.
+  if(!da&&!db) return compareYear(a,b)||compareName(a,b);
+  if(!da) return 1;
+  if(!db) return -1;
+  return da.localeCompare(db);
+ };
+ list.sort((a,b)=>{
+  if(s==="year-asc") return compareYear(a,b)||compareName(a,b);
+  if(s==="year-desc") return compareYear(b,a)||compareName(a,b);
+  if(s==="added-asc") return compareAdded(a,b)||compareYear(a,b)||compareName(a,b);
+  if(s==="added-desc") return compareAdded(b,a)||compareYear(a,b)||compareName(a,b);
+  if(s==="name-desc") return compareName(b,a)||compareYear(a,b);
+  return compareName(a,b)||compareYear(a,b);
+ });
  $("cc-count").textContent=`${list.length} dossiers`;
  $("cc-grid").innerHTML=list.length?list.map(c=>`<a class="card" href="${esc(c.url)}">
   <div class="photo"><img loading="lazy" decoding="async" src="${esc(c.image)}" alt="Dossierfoto bij ${esc(c.name)}" onerror="recoverDossierImage(this)">${c.recentAdded?'<span class="badge new">NIEUW</span>':""}</div>
