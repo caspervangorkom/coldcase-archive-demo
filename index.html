@@ -99,12 +99,13 @@
 @media(max-width:900px){
  #cc-archive-demo .archive-actions{width:100%;grid-template-columns:1fr 1fr;gap:var(--space);margin-left:0;margin-right:0}
  #cc-archive-demo .archive-actions a{min-width:0;min-height:47px;padding:8px 10px;font-size:14px}
- #cc-archive-demo .archive-layout{display:grid;grid-template-columns:minmax(0,1fr);grid-template-areas:"search" "sort" "filters" "categories" "timeline";grid-auto-rows:auto;gap:var(--space);margin-bottom:var(--space)}
- #cc-archive-demo .search{grid-area:search}
- #cc-archive-demo .sort-wrap{grid-area:sort}
- #cc-archive-demo .filters{grid-area:filters}
- #cc-archive-demo .category-panel{grid-area:categories;align-self:start;min-height:0;height:auto}
- #cc-archive-demo .timeline{grid-area:timeline;align-self:start;min-height:0;height:auto}
+ /* Mobiel: flex-order is expliciet en ongevoelig voor grid-area overrides van het CMS. */
+ #cc-archive-demo .archive-layout{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:var(--space);margin-bottom:var(--space)}
+ #cc-archive-demo .search{order:1!important;width:100%}
+ #cc-archive-demo .sort-wrap{order:2!important;width:100%}
+ #cc-archive-demo .filters{order:3!important;width:100%}
+ #cc-archive-demo .category-panel{order:4!important;align-self:stretch;flex:none;min-height:0;height:auto;width:100%}
+ #cc-archive-demo .timeline{order:5!important;align-self:stretch;flex:none;min-height:0;height:auto;width:100%}
  #cc-archive-demo .filters{grid-template-columns:1fr 1fr;gap:var(--space)}
  /* sortering staat op mobiel in een eigen regel boven de filters */
  #cc-archive-demo .timeline,#cc-archive-demo .category-panel{padding:12px}
@@ -115,8 +116,10 @@
  #cc-archive-demo .decade-card .period{font-size:12px}
  #cc-archive-demo .decade-card .count{font-size:18px}
  #cc-archive-demo .category-panel{padding:0;overflow:hidden}
- #cc-archive-demo .category-toggle{display:flex;width:100%;align-items:center;justify-content:space-between;min-height:48px;padding:0 13px;border:0;background:#fff;color:var(--navy);font:700 15px Arial,sans-serif;text-align:left;cursor:pointer}
- #cc-archive-demo .category-toggle .chevron{font-size:18px}
+ #cc-archive-demo .category-toggle{appearance:none;-webkit-appearance:none;position:relative;display:block;width:100%;min-height:48px;padding:0 32px 0 13px;border:0;border-radius:0;background:#fff;color:var(--navy);font:700 15px Arial,sans-serif;text-align:left;cursor:pointer}
+ /* Exact dezelfde pijl als de native filtervelden: zelfde SVG, breedte en rechterpositie. */
+ #cc-archive-demo .category-toggle .chevron{position:absolute;right:12px;top:50%;display:block;width:12px;height:8px;margin:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.25 6 6.25 11 1.25' fill='none' stroke='%23224576' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-size:12px 8px;transform:translateY(-50%);transition:transform .15s ease}
+ #cc-archive-demo .category-panel.open .category-toggle .chevron{transform:translateY(-50%) rotate(180deg)}
  #cc-archive-demo .category-content{display:none!important;padding:16px 11px 11px;height:auto;min-height:0}
  #cc-archive-demo .category-content h2{display:none}
  #cc-archive-demo .category-panel.open .category-content{display:block!important}
@@ -160,7 +163,7 @@
    <div class="year-picker" id="cc-year-picker"><label for="cc-year">Of kies een specifiek jaar</label><select id="cc-year" aria-label="Specifiek jaar"><option value="">Alle jaren in deze periode</option></select></div>
   </div>
   <section class="category-panel" id="cc-category-panel" aria-label="Zaken per categorie">
-   <button class="category-toggle" id="cc-category-toggle" type="button" aria-expanded="false"><span>Zaken per categorie</span><span class="chevron">⌄</span></button>
+   <button class="category-toggle" id="cc-category-toggle" type="button" aria-expanded="false"><span>Zaken per categorie</span><span class="chevron" aria-hidden="true"></span></button>
    <div class="category-content" id="cc-category-content"><h2>Zaken per categorie</h2><div class="category-list" id="cc-category-list"></div></div>
   </section>
  </section>
@@ -322,6 +325,6 @@ setup();renderChart();renderCards();
 $("cc-decade").addEventListener("change",()=>{selectedYear="";renderChart();renderCards();});
 $("cc-year").addEventListener("change",()=>{selectedYear=$("cc-year").value;renderCards();});
 $("cc-type").addEventListener("change",()=>{selectedYear="";renderChart();renderCards();});
-$("cc-category-toggle").addEventListener("click",()=>{const panel=$("cc-category-panel");const open=panel.classList.toggle("open");$("cc-category-toggle").setAttribute("aria-expanded",String(open));$("cc-category-toggle").querySelector(".chevron").textContent=open?"⌃":"⌄";});
+$("cc-category-toggle").addEventListener("click",()=>{const panel=$("cc-category-panel");const open=panel.classList.toggle("open");$("cc-category-toggle").setAttribute("aria-expanded",String(open));});
 </script>
 </body></html>
