@@ -87,19 +87,29 @@
 #cc-archive-demo .card:focus-visible .arrow{color:var(--red)}
 #cc-archive-demo .empty{padding:20px;border:1px dashed var(--line);border-radius:8px;color:var(--muted);font-size:14px}
 #cc-archive-demo .sample-note{font-size:11px;color:var(--muted);margin:0 0 var(--space)}
+@media(min-width:761px){
+ #cc-archive-demo .category-content h2{font-size:17px}
+}
 @media(min-width:680px){
  #cc-archive-demo{padding:22px 22px 56px}
  #cc-archive-demo .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
  #cc-archive-demo .photo{aspect-ratio:4/5}
 }
 @media(min-width:1020px){#cc-archive-demo .grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:760px){
+@media(max-width:900px){
  #cc-archive-demo .archive-actions{width:100%;grid-template-columns:1fr 1fr;gap:var(--space);margin-left:0;margin-right:0}
  #cc-archive-demo .archive-actions a{min-width:0;min-height:47px;padding:8px 10px;font-size:14px}
- #cc-archive-demo .archive-layout{grid-template-columns:minmax(0,1fr);grid-template-areas:"search" "sort" "filters" "timeline" "categories";gap:var(--space);margin-bottom:var(--space)}
+ #cc-archive-demo .archive-layout{display:grid;grid-template-columns:minmax(0,1fr);grid-template-areas:"search" "sort" "filters" "categories" "timeline";grid-auto-rows:auto;gap:var(--space);margin-bottom:var(--space)}
+ #cc-archive-demo .search{grid-area:search}
+ #cc-archive-demo .sort-wrap{grid-area:sort}
+ #cc-archive-demo .filters{grid-area:filters}
+ #cc-archive-demo .category-panel{grid-area:categories;align-self:start;min-height:0;height:auto}
+ #cc-archive-demo .timeline{grid-area:timeline;align-self:start;min-height:0;height:auto}
  #cc-archive-demo .filters{grid-template-columns:1fr 1fr;gap:var(--space)}
  /* sortering staat op mobiel in een eigen regel boven de filters */
  #cc-archive-demo .timeline,#cc-archive-demo .category-panel{padding:12px}
+ /* Mobiel: titel "Zaken door de jaren heen" even groot als de categorie-switch */
+ #cc-archive-demo .timeline-head h2{font-size:15px}
  #cc-archive-demo .decade-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space)}
  #cc-archive-demo .decade-card{min-height:62px;padding:9px 10px}
  #cc-archive-demo .decade-card .period{font-size:12px}
@@ -107,9 +117,11 @@
  #cc-archive-demo .category-panel{padding:0;overflow:hidden}
  #cc-archive-demo .category-toggle{display:flex;width:100%;align-items:center;justify-content:space-between;min-height:48px;padding:0 13px;border:0;background:#fff;color:var(--navy);font:700 15px Arial,sans-serif;text-align:left;cursor:pointer}
  #cc-archive-demo .category-toggle .chevron{font-size:18px}
- #cc-archive-demo .category-content{display:none;padding:16px 11px 11px}
+ #cc-archive-demo .category-content{display:none!important;padding:16px 11px 11px;height:auto;min-height:0}
  #cc-archive-demo .category-content h2{display:none}
- #cc-archive-demo .category-panel.open .category-content{display:block}
+ #cc-archive-demo .category-panel.open .category-content{display:block!important}
+ #cc-archive-demo .category-list{display:flex!important;flex-direction:column;gap:var(--space);visibility:visible;height:auto;min-height:0}
+ #cc-archive-demo .category-choice{display:flex!important;visibility:visible}
  #cc-archive-demo .category-panel.open .category-toggle{border-bottom:1px solid var(--line)}
  #cc-archive-demo .category-choice{min-height:40px}
 }
